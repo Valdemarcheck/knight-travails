@@ -140,7 +140,7 @@ function prettyPrint(startCoordsArray, endCoordsArray, pathToNeededTileArray) {
   }
 }
 
-module.exports = function knightTravails(startCoordsArray, endCoordsArray) {
+module.exports = function knightMoves(startCoordsArray, endCoordsArray) {
   // build a tree
   // build nodes on the tree until you get the node with endCoordsArray
   // get all the nodes from that node up to a parent node
