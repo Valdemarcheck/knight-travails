@@ -17,17 +17,10 @@ function getNewCoordsArray(startCoordsArray) {
 }
 
 function isNotYetPresentInTree(coords, usedCoordsArray) {
-  // console.log("Used coords: ", usedCoordsArray);
-  return usedCoordsArray.every((currentCoords) => {
-    // console.log(
-    //   "Current: ",
-    //   coords,
-    //   "Next: ",
-    //   currentCoords,
-    //   coords.x !== currentCoords.x || coords.y !== currentCoords.y
-    // );
-    return coords.x !== currentCoords.x || coords.y !== currentCoords.y;
-  });
+  return usedCoordsArray.every(
+    (currentCoords) =>
+      coords.x !== currentCoords.x || coords.y !== currentCoords.y
+  );
 }
 
 function isInRange(coords) {
@@ -58,59 +51,48 @@ class Tree {
   }
 
   #setupTree(endCoordsArray) {
-    // setup root node
     const usedCoordsArray = [{ x: this.root.x, y: this.root.y }];
     const queue = [];
     let reachedRequiredCoord = false;
     let currentNode = this.root;
 
-    // let i = 0;
     while (true) {
-      // i++;
       if (reachedRequiredCoord) break;
       if (queue.length > 0) {
         currentNode = queue.shift();
       }
-      // console.log("Used coords: ", usedCoordsArray);
 
-      // get an array of new coordinates
       const currentNodeCoords = {
         x: currentNode.x,
         y: currentNode.y,
       };
-      // console.log(currentNodeCoords);
-      const newCoordsArray = getNewCoordsArray(currentNodeCoords);
-      // console.log("ALL");
-      // console.log(newCoordsArray);
 
-      // exclude negative ones
-      // exclude recurring ones
+      const newCoordsArray = getNewCoordsArray(currentNodeCoords);
       const validCoordsArray = newCoordsArray.filter((coords) => {
         return (
           isInRange(coords) && isNotYetPresentInTree(coords, usedCoordsArray)
         );
       });
-      // console.log("VALID");
-      // console.log(validCoordsArray);
 
-      // add valid coordinates to used ones
-      // make nodes out of new coordinates. Add them to current node. then add those nodes to a queue. dequeue the queue and make that node a current one
+      // We need an array of valid nodes separately in order to have no trouble setting up
+      // this.nodeWithEndCoords tree property
       const nodesWithValidCoords = [];
       for (let coords of validCoordsArray) {
         usedCoordsArray.push({ x: coords.x, y: coords.y });
+
         const node = new Node(coords, currentNode);
         currentNode.children.push(node);
         nodesWithValidCoords.push(node);
         queue.push(node);
       }
-      // if there is needed coord, leave the loop
+
+      // Stop tree creation if we've reached required tile
       for (let node of nodesWithValidCoords) {
         if (node.x === endCoordsArray[0] && node.y === endCoordsArray[1]) {
           this.nodeWithEndCoords = node;
           reachedRequiredCoord = true;
         }
       }
-      // console.log("==========");
     }
   }
 
@@ -141,11 +123,6 @@ function prettyPrint(startCoordsArray, endCoordsArray, pathToNeededTileArray) {
 }
 
 module.exports = function knightMoves(startCoordsArray, endCoordsArray) {
-  // build a tree
-  // build nodes on the tree until you get the node with endCoordsArray
-  // get all the nodes from that node up to a parent node
-  // print the results in a pretty fashion
-
   const tree = new Tree(startCoordsArray, endCoordsArray);
   const pathToNeededTileArray = tree.getPathFromRequiredNode();
   prettyPrint(startCoordsArray, endCoordsArray, pathToNeededTileArray);
