@@ -17,8 +17,16 @@ function getNewCoordsArray(startCoords) {
 }
 
 function isNotYetPresentInTree(coords, usedCoordsArray) {
+  // console.log("Used coords: ", usedCoordsArray);
   return usedCoordsArray.every((currentCoords) => {
-    return coords.x !== currentCoords.x && coords.y !== currentCoords.y;
+    // console.log(
+    //   "Current: ",
+    //   coords,
+    //   "Next: ",
+    //   currentCoords,
+    //   coords.x !== currentCoords.x || coords.y !== currentCoords.y
+    // );
+    return coords.x !== currentCoords.x || coords.y !== currentCoords.y;
   });
 }
 
@@ -50,19 +58,27 @@ class Tree {
     // setup root node
     const usedCoordsArray = [{ x: this.root.x, y: this.root.y }];
     const queue = [];
+    let reachedRequiredCoord = false;
     let currentNode = this.root;
 
+    // let i = 0;
     while (true) {
-      if (currentNode !== this.root && queue.length === 0) break;
+      // i++;
+      if (reachedRequiredCoord) break;
       if (queue.length > 0) {
         currentNode = queue.shift();
       }
+      // console.log("Used coords: ", usedCoordsArray);
 
       // get an array of new coordinates
-      const newCoordsArray = getNewCoordsArray({
+      const currentNodeCoords = {
         x: currentNode.x,
         y: currentNode.y,
-      });
+      };
+      // console.log(currentNodeCoords);
+      const newCoordsArray = getNewCoordsArray(currentNodeCoords);
+      // console.log("ALL");
+      // console.log(newCoordsArray);
 
       // exclude negative ones
       // exclude recurring ones
@@ -71,26 +87,31 @@ class Tree {
           isInRange(coords) && isNotYetPresentInTree(coords, usedCoordsArray)
         );
       });
+      // console.log("VALID");
+      // console.log(validCoordsArray);
 
       // add valid coordinates to used ones
       // make nodes out of new coordinates. Add them to current node. then add those nodes to a queue. dequeue the queue and make that node a current one
+      const nodesWithValidCoords = [];
       for (let coords of validCoordsArray) {
         usedCoordsArray.push({ x: coords.x, y: coords.y });
         const node = new Node(coords, currentNode);
         currentNode.children.push(node);
+        nodesWithValidCoords.push(node);
         queue.push(node);
       }
       // if there is needed coord, leave the loop
-      for (let coords of validCoordsArray) {
-        if (coords.x === endCoordsArray[0] && coords.y === endCoordsArray[1]) {
-          console.log("It must leave");
-          break;
+      for (let node of nodesWithValidCoords) {
+        if (node.x === endCoordsArray[0] && node.y === endCoordsArray[1]) {
+          this.nodeWithEndCoords = node;
+          reachedRequiredCoord = true;
         }
       }
+      // console.log("==========");
     }
   }
 
-  getPathToNode(coords) {}
+  getPathFromRequiredNode() {}
 }
 
 function prettyPrint(nodesArray) {}
@@ -102,7 +123,7 @@ module.exports = function knightTravails(startCoords, endCoords) {
   // print the results in a pretty fashion
 
   const tree = new Tree(startCoords, endCoords);
-  // return tree.getPathToNode(endCoords);
+  const fullPath = tree.getPathFromRequiredNode();
   return tree;
   // const pathToNeededTile = tree.getPathToNode(endCoords);
   // prettyPrint(pathToNeededTile);
