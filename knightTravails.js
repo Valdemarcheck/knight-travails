@@ -1,9 +1,9 @@
 const BOARD_SIZE_MIN = 0;
 const BOARD_SIZE_MAX = 7;
 
-function getNewCoordsArray(startCoords) {
-  const x0 = startCoords.x;
-  const y0 = startCoords.y;
+function getNewCoordsArray(startCoordsArray) {
+  const x0 = startCoordsArray.x;
+  const y0 = startCoordsArray.y;
   return [
     { x: x0 + 2, y: y0 + 1 },
     { x: x0 + 2, y: y0 - 1 },
@@ -49,8 +49,11 @@ class Node {
 }
 
 class Tree {
-  constructor(startCoordsArray, endCoordsArray) {
-    this.root = new Node({ x: startCoordsArray[0], y: startCoordsArray[1] });
+  constructor(startCoordsArrayArray, endCoordsArray) {
+    this.root = new Node({
+      x: startCoordsArrayArray[0],
+      y: startCoordsArrayArray[1],
+    });
     this.#setupTree(endCoordsArray);
   }
 
@@ -125,17 +128,25 @@ class Tree {
   }
 }
 
-function prettyPrint(nodesArray) {}
+function prettyPrint(startCoordsArray, endCoordsArray, pathToNeededTileArray) {
+  console.log(
+    `> knightMoves([${startCoordsArray[0]},${startCoordsArray[1]}],[${endCoordsArray[0]},${endCoordsArray[1]}])`
+  );
+  console.log(
+    `You made it in ${pathToNeededTileArray.length} moves! Here's your path:`
+  );
+  for (let coords of pathToNeededTileArray) {
+    console.log(`[${coords.x},${coords.y}]`);
+  }
+}
 
-module.exports = function knightTravails(startCoords, endCoords) {
+module.exports = function knightTravails(startCoordsArray, endCoordsArray) {
   // build a tree
-  // build nodes on the tree until you get the node with endCoords
+  // build nodes on the tree until you get the node with endCoordsArray
   // get all the nodes from that node up to a parent node
   // print the results in a pretty fashion
 
-  const tree = new Tree(startCoords, endCoords);
-  const fullPath = tree.getPathFromRequiredNode();
-  return fullPath;
-  // const pathToNeededTile = tree.getPathToNode(endCoords);
-  // prettyPrint(pathToNeededTile);
+  const tree = new Tree(startCoordsArray, endCoordsArray);
+  const pathToNeededTileArray = tree.getPathFromRequiredNode();
+  prettyPrint(startCoordsArray, endCoordsArray, pathToNeededTileArray);
 };
