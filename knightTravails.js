@@ -111,7 +111,18 @@ class Tree {
     }
   }
 
-  getPathFromRequiredNode() {}
+  getPathFromRequiredNode() {
+    const allNodesFromRequiredNode = [
+      { x: this.nodeWithEndCoords.x, y: this.nodeWithEndCoords.y },
+    ];
+
+    let parentNode = this.nodeWithEndCoords.parentNode;
+    while (parentNode) {
+      allNodesFromRequiredNode.unshift({ x: parentNode.x, y: parentNode.y });
+      parentNode = parentNode.parentNode;
+    }
+    return allNodesFromRequiredNode;
+  }
 }
 
 function prettyPrint(nodesArray) {}
@@ -124,7 +135,7 @@ module.exports = function knightTravails(startCoords, endCoords) {
 
   const tree = new Tree(startCoords, endCoords);
   const fullPath = tree.getPathFromRequiredNode();
-  return tree;
+  return fullPath;
   // const pathToNeededTile = tree.getPathToNode(endCoords);
   // prettyPrint(pathToNeededTile);
 };
