@@ -16,11 +16,8 @@ function getNewCoordsArray(startCoordsArray) {
   ];
 }
 
-function isNotYetPresentInTree(coords, usedCoordsArray) {
-  return usedCoordsArray.every(
-    (currentCoords) =>
-      coords.x !== currentCoords.x || coords.y !== currentCoords.y
-  );
+function isNotYetPresentInTree(coords, chessBoardObj) {
+  return !chessBoardObj.board[coords.y][coords.x];
 }
 
 function isInRange(coords) {
@@ -30,6 +27,23 @@ function isInRange(coords) {
     coords.y >= BOARD_SIZE_MIN &&
     coords.y <= BOARD_SIZE_MAX
   );
+}
+
+class ChessBoard {
+  constructor(startCoordsObj) {
+    this.board = this.#setupRowsAndColumns();
+    this.setTileAsUsedOne(startCoordsObj);
+  }
+
+  #setupRowsAndColumns() {
+    return Array.from({ length: 8 }, () => {
+      return Array.from({ length: 8 }, () => false);
+    });
+  }
+
+  setTileAsUsedOne(coordsObj) {
+    this.board[coordsObj.x][coordsObj.y] = true;
+  }
 }
 
 class Node {
@@ -51,8 +65,9 @@ class Tree {
   }
 
   #setupTree(endCoordsArray) {
-    const usedCoordsArray = [{ x: this.root.x, y: this.root.y }];
+    const startCoordsObj = { x: this.root.x, y: this.root.y };
     const queue = [];
+    const chessBoardObj = new ChessBoard(startCoordsObj);
     let reachedRequiredCoord = false;
     let currentNode = this.root;
 
@@ -70,7 +85,7 @@ class Tree {
       const newCoordsArray = getNewCoordsArray(currentNodeCoords);
       const validCoordsArray = newCoordsArray.filter((coords) => {
         return (
-          isInRange(coords) && isNotYetPresentInTree(coords, usedCoordsArray)
+          isInRange(coords) && isNotYetPresentInTree(coords, chessBoardObj)
         );
       });
 
@@ -78,7 +93,7 @@ class Tree {
       // this.nodeWithEndCoords tree property
       const nodesWithValidCoords = [];
       for (let coords of validCoordsArray) {
-        usedCoordsArray.push({ x: coords.x, y: coords.y });
+        chessBoardObj.setTileAsUsedOne(coords);
 
         const node = new Node(coords, currentNode);
         currentNode.children.push(node);
